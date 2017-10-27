@@ -1,4 +1,4 @@
-## Regex Baby
+## Baby Regex
 ```text
 Open your eyes is all that is needing. The heart lies and the head plays tricks with us, but the eyes see true. Look with your eyes. Hear with your ears. Taste with your mouth. Smell with your nose. Feel with your skin. Then comes the thinking, afterward, and in that way <knowing the truth. 
 >
