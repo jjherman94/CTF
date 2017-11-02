@@ -34,46 +34,60 @@ The best tool for this was using https://regexr.com/ so that I could see exactly
 >Type the regex that capture: "from "Drivin" until the end of phrase, without using any letter, single quotes or wildcards, and capturing "Drivin'" in a group, and "blue." in another", with max. "16" chars:
 
 Given that the phrase was the very last line in the text I could use `.+$` to get the just the last line of the text and then it was just a matter of getting the two groups which ended up being the first seven characters and the last five characters.
+
 `(.{7}).+(.{5})$`
 
 ---
+### 
 
 >Type the regex that capture: "(BONUS) What's the name of the big american television channel (current days) that matchs with this regex: .(.)\1", with max. "x" chars:  
 
 The `\1` is a backreference to the first captured group `(.)` so then we know that the last two letters are the same so it becomes just a question of thinking of a three letter television channel where the last two letters are the same.
+
 `CNN`
 
 ---
+###
 
 >Type the regex that capture: "<knowing the truth. >, without using "line break"", with max. "8" chars:  
 
 We need to capture everything between `<` and `>` which is just `<.+\n>` but since we can't use any line breaks we instead replace it with `\s` which is any whitespace character.
+
 `<.+\s>`
 
 ---
+###
 
 >Type the regex that capture: "the only word that repeat itself in the same word, using a group called "a" (and use it!), and the group expression must have a maximum of 3 chars, without using wildcards, plus signal, the word itself or letters different than [Pa]", with max. "16" chars:
 
 After finding the only word that repeats itself in the text `blabla`, I figured out it can be easily captured with `(..a)\1` but the challenged required the group to be named. Since https://regexr.com/ doesn't support named groups the challenge then became trying to find the proper way to name groups in Python2.7's regex. From looking up the documentation for Python's regex library I was then able to find that `(?P<name>...)` could be used to create a named group and then it could be backreferenced with `(?P=name)`
+
 `(?P<a>..a)(?P=a)`
 
 ---
+###
 
 >Type the regex that capture: "All "Open's", without using that word or [Ope-], and no more than one point", with max. "11" chars:
 
-Initially I noticed that I could use `^\w+n` to get the first Open since `^` represents the beginning of the string so I then experimented with different ways to get the second Open. One idea I came up with was using positive lookbehind to look for either the beginning of the text or the `>\n`. That positive lookbehind `(?<=^|>\n)\w+n` captured both Open's but was too many characters. I went through a bunch of trial and error trying to make it less characters including trying to use a word boundary `\b` in the form of `\b\w{3}n`. Eventually I figured out that the regex accepted escaped hexidecimal so I could effectively use an `O` with `\x4f` which made things a lot easier.
+Initially I noticed that I could use `^\w+n` to get the first Open since `^` represents the beginning of the string so I then experimented with different ways to get the second Open. One idea I came up with was using positive lookbehind to look for either the beginning of the text or the `>\n`. That positive lookbehind `(?<=^|>\n)\w+n` captured both Open's but was too many characters. I went through a bunch of trial and error trying to make it less characters including trying to use a word boundary `\b` in the form of `\b\w{3}n`. Eventually I figured out that the regex accepted escaped hexidecimal so I could effectively use an `O` with `\x4f` which made things a lot easier. 
+
 `\x4f\w+n`
 
 ---
+###
 
 >Type the regex that capture: "Chips" and "code.", and it is only allowed the letter "c" (insensitive)", with max. "15" chars:
 
 My initial attempt was to use `[cC]....\n` but this didn't work since it also captured `Cars.`. Next after noticing the pattern of four words, a comma, two words, and then the words to capture and the pattern of both coming after `your`, I tried to use positive lookbehind but couldn't seem to find a way that stayed under the 15 character limit. Eventually I figured out similarly to the above challenge I could use escape code but this time using octal. By using octal coding I was able to put a `s` into the regex with `\163`.
-`c...\.|C...\163`
+ 
+ `c...\.|C...\163`
 
 ---
+###
 
 >Type the regex that capture: "FLY until... Fly", without wildcards or the word "fly" and using backreference", with max. "14" chars:
+
+I first started off with the simple regex `FLY.+Fly` which captured everything but just didn't satisfy the limitations. Since I had to use backreferencing and the only common letter(s) was `F` then I know I had to change the regex to `(F)LY.+\1ly`. Once I had this I simply just simplified the regex down.
 
 ```regexp
 FLY.+Fly
@@ -84,8 +98,14 @@ FLY.+Fly
 Could've made simpler: `(F).+\1..`
 
 ---
+###
 
 >Type the regex that capture: "the follow words: "unfolds", "within" (just one time), "makes", "inclines" and "shows" (just one time), without using hyphen, a sequence of letters (two or more) or the words itself", with max. "38" chars:
+
+So first I wrote the regex to capture all of the words `unfolds|within|makes|inclines|shows`, but then I need to only capture the words once. I figured out that each word besides `unfolds` followed the word `it` exactly once and `unfolds` followed `and` once from this I added `([td] )` which I later turned into a positive lookbehind, `(?<=t |d )`. Now in order to satisfy the limitation of not having a sequence of letters, I replaced every other character with `.` which is any non-newline character. From there it became a trial and error process of trying to make it shorter, by figuring out which characters I could remove, eventually reducing it to `([td] )(u\w+s|w\w+n|m\w+s|i\w+s|s\w+s)`. I then noticed the pattern from words ending in a `s` so I was able to reduce it down to `([td] )(u\w+|w\w+n|(m|i|s)\w+s)`, but could've reduced it further to `([td] )(w\w+n|(u|m|i|s)\w+s)`. From this point I had the answer `(?<=t |d )(u\w+|w\w+n|(m|i|s)\w+s)` which I thought satisfied all of the conditions but I eventually figured out that I needed to make the `(m|i|s)` be a non-capturing group with `?:`. 
+
+`(?<=t |d )(u\w+|w\w+n|(?:m|i|s)\w+s)`.
+
 ```regexp
 unfolds|within|makes|inclines|shows
 ([td] )(unfolds|within|makes|inclines|shows)
@@ -98,7 +118,7 @@ unfolds|within|makes|inclines|shows
 Could've made simpler: `(?<=t |d )(w\w+n|(?:u|m|i|s)\w+s)`
 
 ---
-
+### Final Solutions
 ```
 nc 200.136.213.148 5000
 Type the regex that capture: "the follow words: "unfolds", "within" (just one time), "makes", "inclines" and "shows" (just one time), without using hyphen, a sequence of letters (two or more) or the words itself", with max. "38" chars: (?<=t |d )(u\w+|w\w+n|(?:m|i|s)\w+s)
